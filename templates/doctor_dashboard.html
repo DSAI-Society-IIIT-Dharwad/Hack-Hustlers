@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MedConnect AI — Doctor Dashboard for managing consultations and prescriptions">
+    <title>MedConnect AI — Doctor Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .section-divider { border:none; border-top:1px solid var(--border-color); margin:1rem 0; }
+        .tests-highlight {
+            background:rgba(6,182,212,0.08);
+            border:1px solid rgba(6,182,212,0.2);
+            border-radius:var(--radius-md); padding:0.75rem;
+            font-size:0.82rem; color:var(--accent-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="page-header">
+            <div class="brand">
+                <div class="brand-icon">🏥</div>
+                <span class="brand-text">MedConnect AI</span>
+            </div>
+            <div class="header-actions">
+                <div class="toggle-container">
+                    <span class="text-xs text-muted font-bold">ONLINE</span>
+                    <input type="checkbox" class="toggle" id="availability-toggle" checked onchange="toggleAvailability(this.checked)">
+                </div>
+                <span id="doctor-name" class="text-sm" style="color:var(--accent-secondary);font-weight:600;"></span>
+                <span class="badge badge-info"><i class="fas fa-user-md"></i> Doctor</span>
+                <button class="btn btn-ghost btn-sm relative" onclick="toggleNotificationPanel()" id="notif-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge hidden" id="notif-badge">0</span>
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="loadDoctorHistory()">
+                    <i class="fas fa-history"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Notification Popup -->
+        <div class="notification-popup" id="notif-popup">
+            <div class="card-header">
+                <h3><i class="fas fa-bell" style="color:var(--warning);"></i> Patient Request</h3>
+                <button class="btn btn-ghost btn-sm btn-icon" onclick="toggleNotificationPanel()">✕</button>
+            </div>
+            <div class="card-body" id="notif-content">
+                <p class="text-muted text-sm">No pending requests</p>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <!-- ═══ VIEW: WAITING ═══ -->
+            <div id="view-waiting">
+                <div class="flex items-center justify-between mb-lg">
+                    <div>
+                        <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="welcome-title">Doctor Dashboard</h1>
+                        <p class="text-muted text-sm mt-sm">Waiting for patient consultations</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="loadDoctorHistory()">
+                        <i class="fas fa-history"></i> History
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid-3 mb-lg">
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(59,130,246,0.15);">👥</div>
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total Consultations</div>
+                    </div>
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.15);">📋</div>
+                        <div class="stat-value" id="stat-today">0</div>
+                        <div class="stat-label">Today's Patients</div>
+                    </div>
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.15);">⚡</div>
+                        <div class="stat-value" style="font-size:1.2rem;font-weight:700;color:var(--success);" id="stat-status">Available</div>
+                        <div class="stat-label">Current Status</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🩺</div>
+                            <p style="font-size:1rem;font-weight:600;margin-bottom:0.5rem;">Ready for Patients</p>
+                            <p class="text-xs">You'll receive a notification when a patient wants to consult with you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ VIEW: ACTIVE CONSULTATION ═══ -->
+            <div id="view-consultation" class="hidden">
+                <div class="flex items-center justify-between mb-md">
+                    <div class="flex items-center gap-md">
+                        <div>
+                            <h2 style="font-size:1.2rem;font-weight:700;">
+                                Active Consultation — <span id="patient-name-header" style="color:var(--accent-secondary);"></span>
+                            </h2>
+                            <p class="text-sm text-muted" id="patient-info-header"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-sm">
+                        <span class="badge badge-success pulse" id="doc-connection-status">
+                            <span class="badge-dot badge-dot-success"></span> Live
+                        </span>
+                        <button class="btn btn-danger btn-sm" onclick="endConsultation()">
+                            <i class="fas fa-phone-slash"></i> End
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Urgency Alert -->
+                <div id="doc-urgency-alert" class="urgency-alert">
+                    <span class="urgency-icon" id="doc-urgency-icon"></span>
+                    <span id="doc-urgency-message"></span>
+                </div>
+
+                <div class="grid-main">
+                    <!-- Left: Transcript & Voice -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-comments" style="color:var(--accent-primary);"></i> Patient Transcript</h3>
+                                <button class="btn btn-ai-fill btn-sm" onclick="aiAutoFillPrescription()" id="ai-autofill-btn">
+                                    <i class="fas fa-magic"></i> AI Auto-Fill
+                                </button>
+                            </div>
+                            <div style="padding:0;">
+                                <div id="doc-transcript-container" class="transcript-container">
+                                    <div class="empty-state" id="doc-transcript-empty">
+                                        <div class="empty-state-icon">💬</div>
+                                        <p>Waiting for patient to speak...</p>
+                                    </div>
+                                </div>
+                                <div class="subtitle-bar" style="margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;">
+                                    <span class="live-dot hidden" id="doc-subtitle-dot"></span>
+                                    <span id="doc-subtitle-text" style="flex:1;">Live subtitles...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctor voice input -->
+                        <div class="card mt-md">
+                            <div class="card-body" style="padding:0;">
+                                <div class="voice-panel">
+                                    <button class="mic-button" id="doc-mic-btn" onclick="toggleDoctorRecording()">
+                                        <i class="fas fa-microphone" id="doc-mic-icon"></i>
+                                    </button>
+                                    <p class="mic-status" id="doc-mic-status">Click to respond to patient</p>
+                                    <div class="waveform hidden" id="doc-waveform">
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div>
+                                    </div>
+                                    <div class="language-selector">
+                                        <label class="text-xs text-muted font-bold">LANGUAGE:</label>
+                                        <select id="doc-language-select" onchange="changeDoctorLanguage(this.value)"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Analysis + Prescription Editor -->
+                    <div>
+                        <!-- AI Summary Banner -->
+                        <div class="ai-prefill-banner" id="ai-prefill-banner">
+                            <h4><i class="fas fa-robot"></i> AI Analysis Summary</h4>
+                            <div id="ai-banner-urgency"></div>
+                            <div class="report-section" style="margin-top:0.5rem;">
+                                <span class="text-xs text-muted font-bold">DIAGNOSIS: </span>
+                                <span id="ai-banner-diagnosis" style="font-weight:700;font-size:0.88rem;"></span>
+                                <span id="ai-banner-confidence" class="confidence-pill" style="margin-left:6px;"></span>
+                            </div>
+                            <div class="symptom-chips" id="ai-banner-symptoms"></div>
+                            <div class="report-section" style="margin-top:0.5rem;">
+                                <span class="text-xs text-muted font-bold">CAUSE: </span>
+                                <span id="ai-banner-cause" style="font-size:0.82rem;color:var(--text-secondary);"></span>
+                            </div>
+                        </div>
+
+                        <!-- Prescription Editor -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-prescription-bottle-medical" style="color:var(--success);"></i> Prescription</h3>
+                                <button class="btn btn-ghost btn-sm" onclick="addMedicineRow()">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <!-- AI suggestions note -->
+                                <div class="ai-suggestion-panel hidden" id="ai-suggestions">
+                                    <h4><i class="fas fa-robot"></i> AI Suggested Medicines</h4>
+                                    <div id="ai-suggestion-list"></div>
+                                </div>
+
+                                <div id="medicines-container"></div>
+
+                                <button class="btn btn-ghost btn-sm btn-block mt-sm" onclick="addMedicineRow()">
+                                    <i class="fas fa-plus"></i> Add Another Medicine
+                                </button>
+
+                                <hr class="section-divider">
+
+                                <div class="form-group mt-sm">
+                                    <label class="form-label">🥗 Diet Recommendations</label>
+                                    <textarea class="form-textarea" id="diet-input" placeholder="AI will suggest based on diagnosis. You can edit..." rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">🏃 Exercise Recommendations</label>
+                                    <textarea class="form-textarea" id="exercise-input" placeholder="Exercise plan..." rows="2"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">🔬 Required Diagnostic Tests</label>
+                                    <textarea class="form-textarea" id="tests-input" placeholder="e.g. CBC, Blood Sugar, ECG..." rows="2"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">📝 Clinical Notes</label>
+                                    <textarea class="form-textarea" id="notes-input" placeholder="Any additional clinical observations..." style="min-height:60px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="card-footer flex gap-sm">
+                                <button class="btn btn-ghost" onclick="savePrescription()" style="flex:1;" id="save-draft-btn">
+                                    <i class="fas fa-save"></i> Save Draft
+                                </button>
+                                <button class="btn btn-success" onclick="approveAndGenerateReport()" style="flex:1.6;" id="approve-btn">
+                                    <i class="fas fa-check-circle"></i> Approve &amp; Generate Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ VIEW: HISTORY ═══ -->
+            <div id="view-history" class="hidden">
+                <div class="flex items-center justify-between mb-lg">
+                    <div>
+                        <h2 style="font-size:1.4rem;font-weight:800;">Consultation History</h2>
+                        <p class="text-muted text-sm mt-sm">All your past patient consultations</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="showWaitingView()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+                <div id="doc-history-list">
+                    <div class="empty-state"><span class="spinner"></span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/voice.js"></script>
+    <script src="/static/js/doctor.js"></script>
+</body>
+</html>
