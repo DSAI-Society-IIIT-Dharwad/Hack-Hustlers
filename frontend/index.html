@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediConsult — AI Multilingual Medical Platform</title>
+  <meta name="description" content="MediConsult: AI-powered multilingual medical consultation platform supporting English, Hindi, and Kannada. Secure, verified, always available." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+
+<div class="auth-page">
+  <!-- Animated background -->
+  <div class="auth-bg"></div>
+
+  <!-- Left hero panel -->
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-logo">⚕️</div>
+      <div class="auth-brand-name gradient-text">MediConsult</div>
+    </div>
+
+    <h1 class="auth-hero-title">
+      Your Health,<br/>
+      <span class="gradient-text">Our Priority</span>
+    </h1>
+    <p class="auth-hero-subtitle">
+      AI-powered multilingual medical consultations in English, हिंदी, and ಕನ್ನಡ.
+      Connect with NMC-verified doctors instantly.
+    </p>
+
+    <div class="auth-features">
+      <div class="auth-feature-item">
+        <div class="auth-feature-icon">🤖</div>
+        <div class="auth-feature-text">
+          <h4>Gemini AI Assistant</h4>
+          <p>Describe symptoms in your language — English, Hindi, or Kannada</p>
+        </div>
+      </div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-icon">🏅</div>
+        <div class="auth-feature-text">
+          <h4>NMC Verified Doctors</h4>
+          <p>All doctors verified at National Medical Commission level</p>
+        </div>
+      </div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-icon">🔒</div>
+        <div class="auth-feature-text">
+          <h4>End-to-End Encrypted</h4>
+          <p>Your health data is bcrypt-hashed and JWT-secured</p>
+        </div>
+      </div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-icon">⚡</div>
+        <div class="auth-feature-text">
+          <h4>Real-Time Notifications</h4>
+          <p>Doctors receive instant alerts via WebSocket technology</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right auth panel -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <h2 class="auth-card-title" id="auth-title">Welcome back</h2>
+      <p class="auth-card-subtitle" id="auth-subtitle">Sign in to your MediConsult account</p>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="login-tab">Sign In</button>
+        <button class="auth-tab" id="signup-tab">Create Account</button>
+      </div>
+
+      <!-- ─── LOGIN FORM ─── -->
+      <form class="auth-form" id="login-form" style="display:flex">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input id="login-email" type="email" class="form-input" placeholder="doctor@hospital.com" required autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="password-wrapper">
+            <input id="login-password" type="password" class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+            <button type="button" class="password-toggle">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" id="login-btn" class="auth-submit" data-label="Sign In →">Sign In →</button>
+
+        <p class="auth-note">
+          🔒 Your credentials are encrypted with bcrypt hashing and protected by JWT tokens.
+        </p>
+      </form>
+
+      <!-- ─── SIGNUP FORM ─── -->
+      <form class="auth-form" id="signup-form" style="display:none">
+
+        <!-- Role selector -->
+        <div>
+          <label class="form-label mb-8">I am a...</label>
+          <div class="role-selector">
+            <div class="role-option">
+              <input type="radio" name="signup-role" id="role-patient" value="patient" checked />
+              <label for="role-patient">
+                <span class="role-icon">🧑‍⚕️</span>
+                <span class="role-name">Patient</span>
+              </label>
+            </div>
+            <div class="role-option">
+              <input type="radio" name="signup-role" id="role-doctor" value="doctor" />
+              <label for="role-doctor">
+                <span class="role-icon">👨‍⚕️</span>
+                <span class="role-name">Doctor</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common fields -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full Name</label>
+            <input id="signup-name" type="text" class="form-input" placeholder="Dr. Priya Sharma" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email</label>
+            <input id="signup-email" type="email" class="form-input" placeholder="you@email.com" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <div class="password-wrapper">
+              <input id="signup-password" type="password" class="form-input" placeholder="Min 8 chars" required />
+              <button type="button" class="password-toggle">👁</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm">Confirm Password</label>
+            <div class="password-wrapper">
+              <input id="signup-confirm" type="password" class="form-input" placeholder="Repeat password" required />
+              <button type="button" class="password-toggle">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient extra fields -->
+        <div class="extra-fields visible" id="patient-extra">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="patient-age">Age</label>
+              <input id="patient-age" type="number" class="form-input" placeholder="25" min="1" max="120" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="patient-blood">Blood Group</label>
+              <select id="patient-blood" class="form-select">
+                <option value="">Select</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor extra fields -->
+        <div class="extra-fields" id="doctor-extra">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="doctor-spec">Specialization</label>
+              <select id="doctor-spec" class="form-select">
+                <option value="General Medicine">General Medicine</option>
+                <option value="Cardiologist">Cardiologist</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Orthopedic Surgeon">Orthopedic Surgeon</option>
+                <option value="Pediatrician">Pediatrician</option>
+                <option value="Psychiatrist">Psychiatrist</option>
+                <option value="Gynecologist">Gynecologist</option>
+                <option value="Ophthalmologist">Ophthalmologist</option>
+                <option value="ENT Specialist">ENT Specialist</option>
+                <option value="Oncologist">Oncologist</option>
+                <option value="Endocrinologist">Endocrinologist</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doctor-years">Years of Experience</label>
+              <input id="doctor-years" type="number" class="form-input" placeholder="5" min="0" max="60" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doctor-nmc">NMC Registration ID</label>
+            <input id="doctor-nmc" type="text" class="form-input" placeholder="NMC20034521" />
+            <span class="nmc-hint">✅ IDs starting with "NMC" followed by 8+ digits are auto-verified</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doctor-bio">Short Bio</label>
+            <textarea id="doctor-bio" class="form-textarea" placeholder="Brief professional summary..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" id="signup-btn" class="auth-submit" data-label="Create Account →">Create Account →</button>
+
+        <p class="auth-note">
+          By signing up you agree to our Terms of Service. Your data is encrypted and never shared.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+</body>
+</html>

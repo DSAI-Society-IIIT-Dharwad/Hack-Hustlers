@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Consultation - MediConsult</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/consultation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="consultation-container">
+        <!-- Header -->
+        <header class="consultation-header">
+            <div class="meeting-info">
+                <h1 id="doctorNameHeader">Dr. Priya Sharma</h1>
+                <p id="doctorSpecHeader">Cardiologist · NMC Verified</p>
+            </div>
+            <div class="meeting-duration">
+                <span id="durationTime">00:00</span>
+            </div>
+            <button class="end-consultation-btn" onclick="endConsultation()">
+                <i class="fas fa-phone-slash"></i> End
+            </button>
+        </header>
+
+        <!-- Main Consultation Area -->
+        <div class="consultation-main">
+            <!-- Left: Video/Audio Area -->
+            <div class="video-area">
+                <div class="video-container">
+                    <div id="videoPlaceholder" class="video-placeholder">
+                        <i class="fas fa-video"></i>
+                        <p>Video streaming placeholder</p>
+                    </div>
+                    <!-- Mic Status -->
+                    <div class="mic-status" id="micStatus">
+                        <i class="fas fa-microphone-slash"></i> Mic Off
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Chat & Medical Data -->
+            <div class="consultation-panel">
+                <!-- Tabs -->
+                <div class="panel-tabs">
+                    <button class="tab-btn active" onclick="switchTab('chat')">
+                        <i class="fas fa-comments"></i> Chat
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('symptoms')">
+                        <i class="fas fa-symptoms"></i> Symptoms
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('vitals')">
+                        <i class="fas fa-heart"></i> Vitals
+                    </button>
+                </div>
+
+                <!-- Chat Tab -->
+                <div class="tab-content active" id="chatTab">
+                    <div class="chat-area">
+                        <div class="messages" id="consultationMessages">
+                            <div class="system-message">
+                                Consultation started. Describe your symptoms in your preferred language.
+                            </div>
+                        </div>
+                        <div class="chat-input-wrapper">
+                            <div class="voice-recording">
+                                <button id="recordBtn" class="voice-btn" onclick="toggleRecording()">
+                                    <i class="fas fa-microphone"></i> Record
+                                </button>
+                                <span id="recordingTime" class="recording-time"></span>
+                            </div>
+                            <textarea id="messageInput" class="message-input" placeholder="Type your message or use voice..."></textarea>
+                            <button class="send-message-btn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Symptoms Tab -->
+                <div class="tab-content" id="symptomsTab">
+                    <div class="symptoms-area">
+                        <h4>Reported Symptoms</h4>
+                        <div id="symptomsList" class="symptoms-list">
+                            <p class="empty">No symptoms recorded yet</p>
+                        </div>
+                        <div class="symptom-input">
+                            <input type="text" id="symptomInput" placeholder="Add a symptom..." class="input-small">
+                            <button onclick="addSymptom()" class="btn-small">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vitals Tab -->
+                <div class="tab-content" id="vitalsTab">
+                    <div class="vitals-area">
+                        <h4>Medical Vitals</h4>
+                        <div class="vitals-grid">
+                            <div class="vital-card">
+                                <label>Blood Pressure</label>
+                                <input type="text" placeholder="120/80" class="input-small">
+                            </div>
+                            <div class="vital-card">
+                                <label>Temperature (°C)</label>
+                                <input type="number" placeholder="37" step="0.1" class="input-small">
+                            </div>
+                            <div class="vital-card">
+                                <label>Heart Rate (bpm)</label>
+                                <input type="number" placeholder="72" class="input-small">
+                            </div>
+                            <div class="vital-card">
+                                <label>Blood Sugar (mg/dL)</label>
+                                <input type="number" placeholder="100" class="input-small">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Selector Floating -->
+        <div class="lang-selector-floating">
+            <span class="lang-label">Language:</span>
+            <button class="lang-option active" data-lang="en">EN</button>
+            <button class="lang-option" data-lang="hi">हिंदी</button>
+            <button class="lang-option" data-lang="kn">ಕನ್ನಡ</button>
+        </div>
+    </div>
+
+    <!-- ASR Recording Modal -->
+    <div id="asrModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>🎙️ Recording Audio...</h3>
+            <div class="waveform">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <p id="asrStatus">Listening...</p>
+            <button class="btn-small" onclick="stopRecording()">Stop Recording</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/consultation.js"></script>
+</body>
+</html>

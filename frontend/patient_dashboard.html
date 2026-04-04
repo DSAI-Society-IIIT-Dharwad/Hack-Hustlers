@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Dashboard — MediConsult</title>
+  <meta name="description" content="MediConsult Patient Dashboard: find NMC-verified doctors, chat with AI in Hindi, Kannada, or English, and manage your health history." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/doctor.css" />
+  <link rel="stylesheet" href="/css/patient.css" />
+</head>
+<body>
+
+<div class="dashboard-layout">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">⚕️</div>
+      <div class="sidebar-brand-text">
+        <h2 class="gradient-text">MediConsult</h2>
+        <span>Patient Portal</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="doctors">
+        <span class="nav-icon">🩺</span>
+        <span class="nav-label">Find Doctors</span>
+      </div>
+      <div class="nav-item" data-page="chat">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">AI Health Chat</span>
+      </div>
+      <div class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">My Consultations</span>
+      </div>
+      <div class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">My Profile</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="logout-btn">
+        <div class="user-avatar" id="sidebar-avatar">PA</div>
+        <div class="user-info">
+          <h4 id="sidebar-name">Loading...</h4>
+          <span id="sidebar-email">patient@email.com</span>
+        </div>
+        <span style="color:var(--text-muted);font-size:16px">→</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <h1 class="topbar-title" id="topbar-title">Find Doctors</h1>
+      <div class="topbar-actions">
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary)">
+          <span class="dot dot-green"></span>
+          AI Online
+        </div>
+        <div style="font-size:13px;color:var(--text-secondary)" id="topbar-user">Patient</div>
+      </div>
+    </header>
+
+    <!-- ══════════ PAGE: FIND DOCTORS ══════════ -->
+    <div class="page-content" id="page-doctors">
+
+      <!-- Filter bar -->
+      <div class="filters-bar">
+        <input
+          type="text"
+          id="search-doctors"
+          class="form-input"
+          placeholder="🔍 Search by name or specialization..."
+          style="max-width:280px" />
+        <select id="spec-filter" class="filter-select">
+          <option value="">All Specializations</option>
+        </select>
+        <div id="avail-filter" class="filter-toggle">
+          <span class="dot dot-green"></span>
+          Available Only
+        </div>
+        <button class="btn btn-secondary btn-sm" id="refresh-doctors" style="margin-left:10px">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <!-- Doctors grid -->
+      <div class="doctors-grid" id="doctors-grid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="spinner" style="margin:0 auto 16px"></div>
+          <h3>Loading doctors...</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: AI CHAT ══════════ -->
+    <div class="page-content hidden" id="page-chat">
+      <div class="chat-container">
+
+        <!-- Chat header -->
+        <div class="chat-header">
+          <div class="chat-ai-info">
+            <div class="chat-ai-avatar">🤖</div>
+            <div>
+              <div class="chat-ai-name">MediBot AI</div>
+              <div class="chat-ai-status">
+                <span class="dot dot-green"></span>
+                Powered by Gemini · English / हिंदी / ಕನ್ನಡ
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="lang-selector">
+              <button class="lang-btn active" data-lang="en">EN</button>
+              <button class="lang-btn" data-lang="hi">हि</button>
+              <button class="lang-btn" data-lang="kn">ಕ</button>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="gen-report-btn">📄 Generate Report</button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-message ai">
+            <div class="msg-avatar">🤖</div>
+            <div>
+              <div class="msg-bubble">
+                👋 Hello! I'm <strong>MediBot</strong>, your AI health assistant.<br/><br/>
+                Please start a consultation with a doctor first using the <strong>Find Doctors</strong> tab.
+                I'll then help you describe your symptoms in your preferred language — English, हिंदी, or ಕನ್ನಡ.
+              </div>
+              <span class="msg-time">just now</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+          <textarea
+            id="chat-input"
+            class="chat-input"
+            placeholder="Type your symptoms or health concern... (Press Enter to send)"
+            rows="1"></textarea>
+          <button class="chat-send-btn" id="mic-btn" title="Voice input (ASR)" style="background:#667eea;margin-right:5px">🎙️</button>
+          <button class="chat-send-btn" id="chat-send-btn" title="Send message">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: HISTORY ══════════ -->
+    <div class="page-content hidden" id="page-history">
+      <div class="section-header" style="margin-bottom:20px">
+        <h2 class="section-title">My Consultation History</h2>
+      </div>
+      <div class="history-list" id="history-list">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <h3>No consultations yet</h3>
+          <p>Start your first consultation with one of our verified doctors</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAGE: PROFILE ══════════ -->
+    <div class="page-content hidden" id="page-profile">
+      <div class="profile-grid">
+        <div class="profile-left">
+          <div class="profile-avatar-large" id="profile-avatar-disp">PA</div>
+          <div class="profile-name" id="profile-name-disp">—</div>
+          <div class="profile-spec" id="profile-role-disp">Patient</div>
+          <span class="badge badge-cyan">Patient Account</span>
+          <button class="btn btn-danger btn-sm w-full" onclick="Auth.clear();window.location.href='/'">Sign Out</button>
+        </div>
+        <div class="profile-right">
+          <h3 style="margin-bottom:4px;font-size:17px;font-weight:700">Personal Details</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Your health profile information</p>
+          <div class="profile-field">
+            <div class="profile-field-label">Full Name</div>
+            <div class="profile-field-value" id="profile-name-disp2">—</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Email Address</div>
+            <div class="profile-field-value" id="profile-email-disp">—</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Age</div>
+            <div class="profile-field-value" id="profile-age-disp">—</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Blood Group</div>
+            <div class="profile-field-value" id="profile-blood-disp">—</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Preferred Languages</div>
+            <div class="profile-field-value">
+              <span class="badge badge-cyan" style="margin-right:4px">🇬🇧 English</span>
+              <span class="badge badge-amber" style="margin-right:4px">🇮🇳 Hindi</span>
+              <span class="badge badge-purple">🌟 Kannada</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /dashboard-layout -->
+
+<!-- ─── CONSULTATION REQUEST MODAL ─── -->
+<div class="modal-overlay" id="consult-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Request Consultation</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px">
+          With <strong id="modal-doctor-name">Doctor</strong> &nbsp;·&nbsp;
+          <span id="modal-doctor-spec" style="color:var(--cyan)">Specialization</span>
+        </p>
+      </div>
+      <button class="modal-close" id="close-consult-modal">✕</button>
+    </div>
+    <div class="divider"></div>
+
+    <div class="form-group" style="margin-bottom:20px">
+      <label class="form-label">Preferred Language for Consultation</label>
+      <select id="modal-lang" class="form-select">
+        <option value="en">🇬🇧 English</option>
+        <option value="hi">🇮🇳 Hindi (हिंदी)</option>
+        <option value="kn">🌟 Kannada (ಕನ್ನಡ)</option>
+      </select>
+    </div>
+
+    <div style="padding:14px;background:var(--cyan-dim);border:1px solid rgba(0,212,255,0.2);border-radius:var(--radius);font-size:13px;color:var(--text-secondary);margin-bottom:20px">
+      ⚡ The doctor will receive an instant notification about your consultation request.
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost w-full" id="cancel-consult-btn" onclick="document.getElementById('consult-modal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary w-full" id="confirm-consult-btn" data-doctor-id="">✅ Start Consultation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── REPORT MODAL ─── -->
+<div class="modal-overlay" id="history-report-modal">
+  <div class="modal-box" style="max-width:640px">
+    <div class="modal-header" style="align-items:center;gap:10px">
+      <div>
+        <h3 class="modal-title">📄 Consultation Report</h3>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" id="download-report-btn">⬇️ Download</button>
+        <button class="btn btn-ghost btn-sm" id="print-report-btn">🖨️ Print</button>
+        <button class="modal-close" id="close-report-modal">✕</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="report-content" id="history-report-content">No report available.</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="/js/enhanced-api.js"></script>
+<script src="/js/enhanced-patient.js"></script>
+</body>
+</html>

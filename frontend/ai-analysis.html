@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis & Diagnosis - MediConsult</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/ai-analysis.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="analysis-container">
+        <!-- Header -->
+        <header class="analysis-header">
+            <h1>AI-Powered Medical Analysis</h1>
+            <p>Comprehensive symptom analysis and diagnosis recommendations</p>
+        </header>
+
+        <div class="analysis-main">
+            <!-- Left Section: Symptoms & Data -->
+            <div class="analysis-left">
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-clipboard-list"></i> Reported Symptoms
+                    </h2>
+                    <div id="symptomsList" class="symptoms-display">
+                        <div class="symptom-item">
+                            <span class="symptom-name">Chest Pain</span>
+                            <span class="symptom-duration">Duration: 3 days</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-heartbeat"></i> Patient Vitals
+                    </h2>
+                    <div class="vitals-summary">
+                        <div class="vital">
+                            <label>Blood Pressure</label>
+                            <value>120/80 mmHg</value>
+                        </div>
+                        <div class="vital">
+                            <label>Heart Rate</label>
+                            <value>78 bpm</value>
+                        </div>
+                        <div class="vital">
+                            <label>Temperature</label>
+                            <value>37.2°C</value>
+                        </div>
+                        <div class="vital">
+                            <label>Blood Sugar</label>
+                            <value>105 mg/dL</value>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-history"></i> Medical History
+                    </h2>
+                    <div id="medicalHistoryList">
+                        <p class="empty-state">No previous consultations</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Section: AI Analysis -->
+            <div class="analysis-right">
+                <!-- AI Diagnosis -->
+                <section class="analysis-card prominent">
+                    <div class="card-header">
+                        <h2><i class="fas fa-robot"></i> AI Diagnosis</h2>
+                        <span class="ai-badge">AI Analysis</span>
+                    </div>
+                    <div class="diagnosis-box" id="diagnosisBox">
+                        <div class="loading-spinner"></div>
+                        <p>Analyzing symptoms...</p>
+                    </div>
+                </section>
+
+                <!-- Risk Assessment -->
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-exclamation-triangle"></i> Risk Assessment
+                    </h2>
+                    <div id="riskAssessment" class="risk-box">
+                        <div class="risk-level high">
+                            <span class="risk-label">Medical Urgency</span>
+                            <span class="risk-value">MODERATE</span>
+                        </div>
+                        <div class="risk-description">
+                            Consider follow-up consultation within 48 hours for further evaluation.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recommended Tests -->
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-flask"></i> Recommended Tests
+                    </h2>
+                    <div id="recommendedTests" class="tests-list">
+                        <div class="test-item">
+                            <i class="fas fa-check-circle"></i> Complete Blood Count (CBC)
+                        </div>
+                        <div class="test-item">
+                            <i class="fas fa-check-circle"></i> Electrocardiogram (ECG)
+                        </div>
+                        <div class="test-item">
+                            <i class="fas fa-check-circle"></i> Chest X-ray
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lifestyle Recommendations -->
+                <section class="analysis-card">
+                    <h2>
+                        <i class="fas fa-leaf"></i> Lifestyle Recommendations
+                    </h2>
+                    <div id="lifestyleRecommendations" class="recommendations-list">
+                        <div class="recommendation">
+                            <strong>Diet:</strong> Low sodium diet, avoid caffeine and heavy foods
+                        </div>
+                        <div class="recommendation">
+                            <strong>Exercise:</strong> Light walking for 20 minutes daily
+                        </div>
+                        <div class="recommendation">
+                            <strong>Sleep:</strong> Maintain 7-8 hours of sleep
+                        </div>
+                        <div class="recommendation">
+                            <strong>Stress:</strong> Practice meditation and yoga
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Prescription Section -->
+        <section class="analysis-card full-width">
+            <h2>
+                <i class="fas fa-pills"></i> Prescribed Medications
+            </h2>
+            <div id="prescriptionList" class="prescription-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                            <th>Instructions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicineList">
+                        <tr>
+                            <td>Aspirin</td>
+                            <td>100 mg</td>
+                            <td>Once daily</td>
+                            <td>7 days</td>
+                            <td>Take with food</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-primary" onclick="goToReport()">
+                <i class="fas fa-arrow-right"></i> Generate Medical Report
+            </button>
+        </section>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button class="btn-primary" onclick="goToReport()">
+                <i class="fas fa-file"></i> View Report
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/ai-analysis.js"></script>
+</body>
+</html>

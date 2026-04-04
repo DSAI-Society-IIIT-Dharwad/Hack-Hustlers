@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Report - MediConsult</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/medical-report.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="report-container">
+        <!-- Report Header -->
+        <header class="report-header">
+            <div class="hospital-header">
+                <h1>🏥 MediConsult Medical Report</h1>
+                <p>Confidential Medical Document</p>
+            </div>
+            <div class="language-selector">
+                <span>Report Language:</span>
+                <button class="lang-btn active" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="hi">हिंदी</button>
+                <button class="lang-btn" data-lang="kn">ಕನ್ನಡ</button>
+            </div>
+        </header>
+
+        <!-- Main Report -->
+        <div class="report-content">
+
+            <!-- Patient Information Section -->
+            <section class="report-section">
+                <h2>PATIENT INFORMATION</h2>
+                <div class="info-grid">
+                    <div class="info-pair">
+                        <span class="label">Patient Name</span>
+                        <span class="value" id="reportPatientName">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Age</span>
+                        <span class="value" id="reportPatientAge">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Blood Group</span>
+                        <span class="value" id="reportBloodGroup">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Gender</span>
+                        <span class="value" id="reportGender">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Contact</span>
+                        <span class="value" id="reportContact">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Report Date</span>
+                        <span class="value" id="reportDate">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctor Information Section -->
+            <section class="report-section">
+                <h2>CONSULTING PHYSICIAN</h2>
+                <div class="info-grid">
+                    <div class="info-pair">
+                        <span class="label">Doctor Name</span>
+                        <span class="value" id="reportDoctorName">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Specialization</span>
+                        <span class="value" id="reportSpecialization">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">NMC ID</span>
+                        <span class="value" id="reportNmcId">—</span>
+                    </div>
+                    <div class="info-pair">
+                        <span class="label">Experience</span>
+                        <span class="value" id="reportExperience">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chief Complaints -->
+            <section class="report-section">
+                <h2>CHIEF COMPLAINTS</h2>
+                <div class="complaints-box" id="complaintsList">
+                    <p>• Chest pain for 3 days</p>
+                    <p>• Shortness of breath</p>
+                    <p>• Mild dizziness</p>
+                </div>
+            </section>
+
+            <!-- History of Presenting Illness -->
+            <section class="report-section">
+                <h2>HISTORY OF PRESENTING ILLNESS</h2>
+                <div id="historyBox" class="text-box">
+                    <p>Patient reports onset of symptoms starting 3 days ago. Symptoms have been persistent and affecting daily activities. No recent trauma or head injury reported.</p>
+                </div>
+            </section>
+
+            <!-- Past Medical History -->
+            <section class="report-section">
+                <h2>PAST MEDICAL HISTORY</h2>
+                <div id="pastMedicalHistory" class="text-box">
+                    <p>• Hypertension - controlled</p>
+                    <p>• Diabetes Type 2 - managed</p>
+                    <p>• No known drug allergies (NKDA)</p>
+                </div>
+            </section>
+
+            <!-- Clinical Observations -->
+            <section class="report-section">
+                <h2>CLINICAL OBSERVATIONS & VITALS</h2>
+                <div class="vitals-display">
+                    <div class="vital-box">
+                        <span class="vital-label">Blood Pressure</span>
+                        <span class="vital-value">120/80 mmHg</span>
+                    </div>
+                    <div class="vital-box">
+                        <span class="vital-label">Heart Rate</span>
+                        <span class="vital-value">78 bpm</span>
+                    </div>
+                    <div class="vital-box">
+                        <span class="vital-label">Temperature</span>
+                        <span class="vital-value">37.2°C</span>
+                    </div>
+                    <div class="vital-box">
+                        <span class="vital-label">Blood Sugar</span>
+                        <span class="vital-value">105 mg/dL</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Physical Examination -->
+            <section class="report-section">
+                <h2>PHYSICAL EXAMINATION FINDINGS</h2>
+                <div id="physicalFindings" class="text-box">
+                    <p><strong>General:</strong> Patient is alert and oriented</p>
+                    <p><strong>Cardiovascular:</strong> Heart sounds normal, no murmurs detected</p>
+                    <p><strong>Respiratory:</strong> Bilateral air entry present, no wheezing</p>
+                    <p><strong>ENT:</strong> Throat clear, no abnormality detected</p>
+                </div>
+            </section>
+
+            <!-- Diagnosis -->
+            <section class="report-section prominent">
+                <h2>DIAGNOSIS</h2>
+                <div class="diagnosis-box">
+                    <div class="diagnosis-item">
+                        <h4>Primary Diagnosis</h4>
+                        <p>Stable Angina Pectoris</p>
+                    </div>
+                    <div class="diagnosis-item">
+                        <h4>Secondary Diagnosis</h4>
+                        <p>Hypertension - Controlled</p>
+                    </div>
+                    <div class="diagnosis-item">
+                        <h4>Risk Assessment</h4>
+                        <p><span class="risk-badge moderate">MODERATE RISK</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prescribed Medications -->
+            <section class="report-section">
+                <h2>PRESCRIBED MEDICATIONS</h2>
+                <table class="medicines-table">
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                            <th>Instructions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Aspirin</td>
+                            <td>100 mg</td>
+                            <td>Once daily</td>
+                            <td>7 days</td>
+                            <td>Take with food, after breakfast</td>
+                        </tr>
+                        <tr>
+                            <td>Amlodipine</td>
+                            <td>5 mg</td>
+                            <td>Once daily</td>
+                            <td>Ongoing</td>
+                            <td>Regular BP monitoring advised</td>
+                        </tr>
+                        <tr>
+                            <td>Metformin</td>
+                            <td>500 mg</td>
+                            <td>Twice daily</td>
+                            <td>Ongoing</td>
+                            <td>Take with meals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Diet Plan -->
+            <section class="report-section">
+                <h2>DIETARY RECOMMENDATIONS</h2>
+                <div class="diet-plan">
+                    <h4>Foods to Include:</h4>
+                    <ul>
+                        <li>Whole grains and fiber-rich foods</li>
+                        <li>Fresh fruits and vegetables</li>
+                        <li>Lean proteins (fish, chicken)</li>
+                        <li>Low-fat dairy products</li>
+                    </ul>
+                    <h4 style="margin-top: 15px;">Foods to Avoid:</h4>
+                    <ul>
+                        <li>High-fat and fried foods</li>
+                        <li>Excessive salt intake</li>
+                        <li>Sugary drinks and desserts</li>
+                        <li>Processed foods</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Exercise Chart -->
+            <section class="report-section">
+                <h2>EXERCISE & ACTIVITY RECOMMENDATIONS</h2>
+                <div class="exercise-plan">
+                    <div class="exercise-item">
+                        <h4>Aerobic Exercise</h4>
+                        <p>20-30 minutes of brisk walking or light jogging, 5 days a week</p>
+                    </div>
+                    <div class="exercise-item">
+                        <h4>Flexibility Training</h4>
+                        <p>Yoga or stretching exercises for 15 minutes daily</p>
+                    </div>
+                    <div class="exercise-item">
+                        <h4>Strength Training</h4>
+                        <p>Light resistance exercises 2-3 times per week</p>
+                    </div>
+                    <div class="exercise-item">
+                        <h4>Lifestyle Modifications</h4>
+                        <p>Avoid stress, maintain regular sleep schedule, limit alcohol to 1 unit/day</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Follow-up Recommendations -->
+            <section class="report-section">
+                <h2>FOLLOW-UP RECOMMENDATIONS</h2>
+                <div class="followup-box">
+                    <p>• Next consultation: 1 week</p>
+                    <p>• Recommended tests: ECG, Echocardiogram, Cardiac biomarkers</p>
+                    <p>• Blood pressure monitoring: Daily</p>
+                    <p>• Blood sugar monitoring: As advised</p>
+                    <p>• Emergency contact: If chest pain worsens or new symptoms develop</p>
+                </div>
+            </section>
+
+            <!-- Special Notes -->
+            <section class="report-section">
+                <h2>SPECIAL NOTES</h2>
+                <div class="notes-box">
+                    <p><strong>Disclaimer:</strong> This is an AI-assisted medical consultation. The recommendations and diagnosis are provided for informational purposes and should be reviewed and approved by the consulting physician. For any serious medical condition, please seek immediate professional medical care.</p>
+                    <p style="margin-top: 10px;">Patient is advised to maintain regular follow-ups and adhere to the prescribed treatment plan for optimal recovery.</p>
+                </div>
+            </section>
+
+            <!-- Approval Section -->
+            <section class="report-section">
+                <h2>DOCTOR APPROVAL</h2>
+                <div id="approvalStatus" class="approval-box">
+                    <p class="pending-status">⏳ Awaiting doctor approval...</p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">The doctor will review and approve this report before it's available to you.</p>
+                </div>
+            </section>
+
+            <!-- Report Metadata -->
+            <section class="report-footer">
+                <p>Report ID: {{ report_id }}</p>
+                <p>Generated: {{ report_date }}</p>
+                <p>Status: {{ report_status }}</p>
+            </section>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="report-actions">
+            <button class="btn-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+            <button class="btn-primary" onclick="downloadReport()">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <button class="btn-secondary" onclick="shareReport()">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="btn-secondary" onclick="goToFeedback()">
+                <i class="fas fa-star"></i> Leave Feedback
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/medical-report.js"></script>
+</body>
+</html>
