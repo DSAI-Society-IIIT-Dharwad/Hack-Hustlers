@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS patients (
     gender TEXT,
     blood_group TEXT,
     medical_history TEXT DEFAULT '',
+    preferred_language TEXT DEFAULT 'en',
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -57,6 +58,12 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     approved INTEGER DEFAULT 0,
     approved_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Translation fields
+    patient_language TEXT DEFAULT 'en',
+    medicines_translated TEXT DEFAULT '',
+    diet_translated TEXT DEFAULT '',
+    exercise_translated TEXT DEFAULT '',
+    notes_translated TEXT DEFAULT '',
     FOREIGN KEY (consultation_id) REFERENCES consultations(id)
 );
 

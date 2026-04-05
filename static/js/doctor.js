@@ -540,9 +540,17 @@ async function savePrescription() {
             exercise,
             notes: finalNotes
         });
-        if (result && result.success) showToast('Prescription saved as draft', 'success');
+        if (result && result.success) {
+            showToast('Prescription saved as draft', 'success');
+            return true; // Return success indicator
+        } else {
+            showToast('Failed to save prescription: Unknown error', 'error');
+            return false;
+        }
     } catch (e) {
+        console.error('Prescription save error:', e);
         showToast('Failed to save: ' + e.message, 'error');
+        return false;
     }
 }
 
@@ -556,12 +564,19 @@ async function approveAndGenerateReport() {
 
     try {
         // 1. Save prescription
-        await savePrescription();
+        const saveSuccess = await savePrescription();
+        if (!saveSuccess) {
+            btn.disabled = false;
+            btn.innerHTML = 'Approve & Generate Report';
+            return; // Exit if save failed
+        }
 
         // 2. Get prescription and approve it
         const prescription = await apiCall(`/prescription/${currentConsultation.id}`);
         if (!prescription || !prescription.id) {
             showToast('No prescription found. Please add medicines first.', 'warning');
+            btn.disabled = false;
+            btn.innerHTML = 'Approve & Generate Report';
             return;
         }
 
@@ -572,18 +587,25 @@ async function approveAndGenerateReport() {
         }
 
         // 3. Auto-generate the report
-        const reportResult = await apiCall('/report/generate', 'POST', {
-            consultation_id: currentConsultation.id
-        });
+        try {
+            const reportResult = await apiCall('/report/generate', 'POST', {
+                consultation_id: currentConsultation.id
+            });
 
-        if (reportResult && reportResult.success) {
-            showToast('✅ Prescription approved & report generated! Opening report...', 'success', 5000);
-            // Small delay so toast is visible before new tab opens
-            setTimeout(() => {
-                window.open(`/report/${currentConsultation.id}`, '_blank');
-            }, 800);
-        } else {
-            showToast('✅ Prescription approved! Report generation had an issue.', 'warning');
+            if (reportResult && reportResult.success) {
+                showToast('✅ Prescription approved & report generated! Opening report...', 'success', 5000);
+                // Small delay so toast is visible before new tab opens
+                setTimeout(() => {
+                    window.open(`/report/${currentConsultation.id}`, '_blank');
+                }, 800);
+            } else {
+                const errorMsg = reportResult && reportResult.error ? reportResult.error : 'Unknown error occurred';
+                showToast(`Report generation failed: ${errorMsg}`, 'warning');
+                console.error('Report generation failed:', reportResult);
+            }
+        } catch (reportError) {
+            console.error('Report generation error:', reportError);
+            showToast('Report generation encountered an error. The prescription was approved successfully.', 'warning');
         }
 
     } catch (e) {

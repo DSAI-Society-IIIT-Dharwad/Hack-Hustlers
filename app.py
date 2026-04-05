@@ -16,7 +16,7 @@ from config import Config
 from database import init_db
 
 # Services
-from services.auth_service import register_user, login_user, verify_token, get_user_profile
+from services.auth_service import register_user, login_user, verify_token, get_user_profile, update_patient_language
 from services.doctor_service import (
     list_doctors, get_doctor, get_doctor_by_user_id,
     set_availability, notify_doctor, get_pending_notifications, clear_notification
@@ -139,6 +139,24 @@ def api_login():
 def api_verify():
     profile = get_user_profile(request.user['user_id'])
     return jsonify({'valid': True, 'user': profile})
+
+
+@app.route('/auth/update-language', methods=['POST'])
+@token_required
+def api_update_language():
+    if request.user['role'] != 'patient':
+        return jsonify({'error': 'Only patients can update language preferences'}), 403
+
+    data = request.get_json()
+    language = data.get('language', 'en')
+
+    if language not in get_supported_languages():
+        return jsonify({'error': 'Unsupported language'}), 400
+
+    result = update_patient_language(request.user['user_id'], language)
+    if 'error' in result:
+        return jsonify(result), 400
+    return jsonify(result)
 
 
 # ═══════════════════════════════════════════════════════════════

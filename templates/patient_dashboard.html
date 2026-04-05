@@ -33,6 +33,10 @@
             <div class="header-actions">
                 <span id="user-name" class="text-sm" style="color:var(--text-secondary);"></span>
                 <span class="badge badge-info"><i class="fas fa-user"></i> Patient</span>
+                <div class="language-selector" style="margin-right: 0.5rem;">
+                    <label class="text-xs text-muted font-bold" style="margin-right: 0.5rem;">Language:</label>
+                    <select id="header-language-select" onchange="updatePatientLanguage(this.value)" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></select>
+                </div>
                 <button class="btn btn-ghost btn-sm" onclick="loadHistory()">
                     <i class="fas fa-history"></i> History
                 </button>
@@ -99,6 +103,9 @@
                         <span class="badge badge-success pulse" id="connection-status">
                             <span class="badge-dot badge-dot-success"></span> Live
                         </span>
+                        <button class="btn btn-ghost btn-sm" onclick="toggleConsultationPanel()" id="panel-toggle-btn" title="Toggle AI Panel">
+                            <i class="fas fa-chevron-right" id="panel-toggle-icon"></i>
+                        </button>
                         <button class="btn btn-danger btn-sm" onclick="endConsultation()" id="end-consult-btn">
                             <i class="fas fa-phone-slash"></i> End
                         </button>

@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (welcome) welcome.textContent = `Hello, ${auth.user.name.split(' ')[0]} 👋`;
 
     VoiceEngine.populateLanguageSelector(document.getElementById('language-select'));
+    populateHeaderLanguageSelector();
 
     initSocket();
     loadDoctors();
@@ -523,23 +524,113 @@ function displayPrescription(prescription) {
     const content = document.getElementById('prescription-content');
     let html = '';
 
+    // Language toggle
+    const patientLang = prescription.patient_language || 'en';
+    const langName = getLanguageName(patientLang);
+    const hasTranslation = patientLang !== 'en' && prescription.medicines_translated;
+
+    if (hasTranslation) {
+        html += `<div class="language-toggle" style="margin-bottom: 1rem; text-align: center;">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-primary" onclick="showPrescriptionLanguage('english')" id="btn-english">
+                    English
+                </button>
+                <button class="btn btn-sm" onclick="showPrescriptionLanguage('translated')" id="btn-translated">
+                    ${langName}
+                </button>
+            </div>
+        </div>`;
+    }
+
+    // English version (default)
+    html += '<div id="prescription-english" class="prescription-content">';
+    html += '<div class="prescription-header"><h4>🏥 Prescription</h4><span class="lang-label">English</span></div>';
+
     if (prescription.medicines && prescription.medicines.length > 0) {
+        html += '<div class="prescription-section">';
+        html += '<h5>💊 Medicines</h5>';
         html += '<table class="report-table"><thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead><tbody>';
         prescription.medicines.forEach(m => {
             html += `<tr><td style="font-weight:600;">${escapeHtml(m.name)}</td><td>${escapeHtml(m.dosage)}</td><td>${escapeHtml(m.frequency)}</td><td>${escapeHtml(m.duration || '—')}</td></tr>`;
         });
-        html += '</tbody></table>';
+        html += '</tbody></table></div>';
     }
 
     if (prescription.diet) {
-        html += `<div class="report-section mt-md"><h4>🥗 Diet</h4><p>${escapeHtml(prescription.diet)}</p></div>`;
+        html += `<div class="prescription-section"><h5>🥗 Diet Recommendations</h5><p>${escapeHtml(prescription.diet)}</p></div>`;
     }
     if (prescription.exercise) {
-        html += `<div class="report-section"><h4>🏃 Exercise</h4><p>${escapeHtml(prescription.exercise)}</p></div>`;
+        html += `<div class="prescription-section"><h5>🏃 Exercise Recommendations</h5><p>${escapeHtml(prescription.exercise)}</p></div>`;
+    }
+    if (prescription.additional_notes) {
+        html += `<div class="prescription-section"><h5>📝 Additional Notes</h5><p>${escapeHtml(prescription.additional_notes)}</p></div>`;
+    }
+    html += '</div>';
+
+    // Translated version (hidden by default)
+    if (hasTranslation) {
+        html += '<div id="prescription-translated" class="prescription-content" style="display: none;">';
+        html += `<div class="prescription-header"><h4>🏥 Prescription</h4><span class="lang-label">${langName}</span></div>`;
+
+        if (prescription.medicines_translated && prescription.medicines_translated.length > 0) {
+            html += '<div class="prescription-section">';
+            html += '<h5>💊 Medicines</h5>';
+            html += '<table class="report-table"><thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead><tbody>';
+            prescription.medicines_translated.forEach(m => {
+                html += `<tr><td style="font-weight:600;">${escapeHtml(m.name)}</td><td>${escapeHtml(m.dosage)}</td><td>${escapeHtml(m.frequency)}</td><td>${escapeHtml(m.duration || '—')}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+        }
+
+        if (prescription.diet_translated) {
+            html += `<div class="prescription-section"><h5>🥗 Diet Recommendations</h5><p>${escapeHtml(prescription.diet_translated)}</p></div>`;
+        }
+        if (prescription.exercise_translated) {
+            html += `<div class="prescription-section"><h5>🏃 Exercise Recommendations</h5><p>${escapeHtml(prescription.exercise_translated)}</p></div>`;
+        }
+        if (prescription.notes_translated) {
+            html += `<div class="prescription-section"><h5>📝 Additional Notes</h5><p>${escapeHtml(prescription.notes_translated)}</p></div>`;
+        }
+        html += '</div>';
     }
 
     content.innerHTML = html;
+
+    // Set initial active button
+    if (hasTranslation) {
+        document.getElementById('btn-english').classList.add('btn-primary');
+        document.getElementById('btn-translated').classList.remove('btn-primary');
+    }
+
     showToast('Prescription received!', 'success');
+}
+
+function showPrescriptionLanguage(language) {
+    const englishDiv = document.getElementById('prescription-english');
+    const translatedDiv = document.getElementById('prescription-translated');
+    const btnEnglish = document.getElementById('btn-english');
+    const btnTranslated = document.getElementById('btn-translated');
+
+    if (language === 'english') {
+        englishDiv.style.display = 'block';
+        translatedDiv.style.display = 'none';
+        btnEnglish.classList.add('btn-primary');
+        btnTranslated.classList.remove('btn-primary');
+    } else {
+        englishDiv.style.display = 'none';
+        translatedDiv.style.display = 'block';
+        btnEnglish.classList.remove('btn-primary');
+        btnTranslated.classList.add('btn-primary');
+    }
+}
+
+function getLanguageName(code) {
+    const languages = {
+        'en': 'English', 'hi': 'Hindi', 'kn': 'Kannada', 'te': 'Telugu',
+        'ta': 'Tamil', 'ml': 'Malayalam', 'mr': 'Marathi', 'gu': 'Gujarati',
+        'es': 'Spanish', 'fr': 'French', 'de': 'German'
+    };
+    return languages[code] || code.toUpperCase();
 }
 
 function viewReport() {
@@ -616,6 +707,56 @@ async function endConsultation() {
 
     showToast('Consultation ended', 'info');
     loadPrescription(currentConsultation.id);
+}
+
+// ═══ PANEL TOGGLE ═══
+function toggleConsultationPanel() {
+    const rightPanel = document.querySelector('.grid-main > div:last-child');
+    const toggleIcon = document.getElementById('panel-toggle-icon');
+
+    if (rightPanel.style.display === 'none') {
+        rightPanel.style.display = 'block';
+        toggleIcon.className = 'fas fa-chevron-right';
+    } else {
+        rightPanel.style.display = 'none';
+        toggleIcon.className = 'fas fa-chevron-left';
+    }
+}
+
+// ═══ LANGUAGE MANAGEMENT ═══
+function populateHeaderLanguageSelector() {
+    const select = document.getElementById('header-language-select');
+    if (!select) return;
+
+    select.innerHTML = '';
+    for (const [key, lang] of Object.entries(LANGUAGES)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = `${lang.flag} ${lang.name}`;
+        select.appendChild(opt);
+    }
+
+    // Set current user's language
+    if (auth && auth.user && auth.user.profile && auth.user.profile.preferred_language) {
+        select.value = auth.user.profile.preferred_language;
+    }
+}
+
+async function updatePatientLanguage(language) {
+    try {
+        const result = await apiCall('/auth/update-language', 'POST', { language });
+        if (result && result.success) {
+            showToast('Language preference updated!', 'success');
+            // Update auth object
+            if (auth.user.profile) {
+                auth.user.profile.preferred_language = language;
+            }
+        } else {
+            showToast('Failed to update language', 'error');
+        }
+    } catch (e) {
+        showToast('Failed to update language', 'error');
+    }
 }
 
 // ═══ LOGOUT ═══

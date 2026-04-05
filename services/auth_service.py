@@ -46,9 +46,10 @@ def register_user(name, email, password, role, **extra):
             age = extra.get('age')
             gender = extra.get('gender')
             blood_group = extra.get('blood_group')
+            preferred_language = extra.get('preferred_language', 'en')
             db.execute(
-                "INSERT INTO patients (user_id, age, gender, blood_group) VALUES (?, ?, ?, ?)",
-                (user_id, age, gender, blood_group)
+                "INSERT INTO patients (user_id, age, gender, blood_group, preferred_language) VALUES (?, ?, ?, ?, ?)",
+                (user_id, age, gender, blood_group, preferred_language)
             )
 
         db.commit()
@@ -169,5 +170,22 @@ def get_user_profile(user_id):
             user['profile'] = pat
 
         return user
+    finally:
+        db.close()
+
+
+def update_patient_language(user_id, language):
+    """Update patient's preferred language."""
+    db = get_db()
+    try:
+        db.execute(
+            "UPDATE patients SET preferred_language = ? WHERE user_id = ?",
+            (language, user_id)
+        )
+        db.commit()
+        return {'success': True}
+    except Exception as e:
+        db.rollback()
+        return {'error': str(e)}
     finally:
         db.close()

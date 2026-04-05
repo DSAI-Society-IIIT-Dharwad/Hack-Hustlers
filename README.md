@@ -1,24 +1,53 @@
-# MediConsult — AI Multilingual Medical Platform
+# MediConsult — AI-Powered Multilingual Telemedicine Platform
 
-A comprehensive web platform for AI-powered multilingual medical consultations connecting patients with NMC-verified doctors.
+A comprehensive telemedicine platform featuring AI-driven medical analysis, real-time multilingual consultations, automated prescription translation, and advanced healthcare management.
 
-## Features
+## 🚀 Features
 
-### 🔐 Authentication & Security
+### 🤖 AI-Powered Medical Analysis
+- **Symptom Analysis**: AI analyzes patient symptoms using local database + external APIs (Groq AI, Google Gemini)
+- **Urgency Detection**: Automatically detects medical emergencies and prioritizes consultations
+- **Medicine Verification**: Validates medicines with comprehensive database and AI assistance
+- **Diet & Exercise Recommendations**: Personalized health recommendations
+- **Medical Report Generation**: Structured AI-generated consultation reports
+
+### 🌐 Enhanced Multilingual Support
+- **15+ Languages**: Hindi, Kannada, Telugu, Tamil, Malayalam, Marathi, Gujarati, Spanish, French, German, etc.
+- **Real-time Translation**: Live conversation translation during consultations
+- **Prescription Translation**: Automatic translation of prescriptions to patient's native language
+- **Medical Terminology**: Preserves medical terms in English for accuracy
+- **Language Preference**: User-selectable language settings
+
+### 💊 Smart Prescription System
+- **AI-Generated Prescriptions**: Doctor assistance with AI-suggested treatments
+- **Dual-Language Display**: View prescriptions in English and native language with toggle
+- **Medicine Database**: Comprehensive medicine information with dosages and warnings
+- **Approval Workflow**: Doctor review and approval system
+- **Prescription History**: Complete prescription tracking
+
+### 🔄 Advanced Real-time Communication
+- **WebSocket Integration**: Real-time messaging between doctors and patients
+- **Voice Recognition**: Speech-to-text with multilingual support
+- **Live Subtitles**: Real-time translation display during consultations
+- **Audio Consultation**: Full-duplex voice communication with UI controls
+- **Consultation Panel Toggle**: Improved UI with functional controls
+
+### 🔐 Enhanced Authentication & Security
 - **End-to-end encrypted credentials** using bcrypt hashing and JWT tokens
 - Role-based access (Patient/Doctor)
 - Secure signup with additional fields:
-  - Patients: Age and blood group
+  - Patients: Age, blood group, language preference
   - Doctors: Specialization, years of experience, NMC ID, bio
 
-### 👨‍⚕️ Doctor Dashboard
+### 👨‍⚕️ Enhanced Doctor Dashboard
 - **Real-time notifications** via WebSocket when patients request consultations
 - **Availability toggle** to control consultation availability
-- **Past consultation history** with text reports
+- **Past consultation history** with detailed reports
 - **Statistics overview** (total, completed, pending consultations)
 - **Profile management** with NMC verification status
+- **Prescription Management**: Create, approve, and manage prescriptions
 
-### 🧑‍⚕️ Patient Dashboard
+### 🧑‍⚕️ Enhanced Patient Dashboard
 - **Find doctors** with advanced filtering:
   - By specialization
   - By availability
@@ -28,132 +57,231 @@ A comprehensive web platform for AI-powered multilingual medical consultations c
   - Years of experience
   - NMC verification status
   - Bio and availability
-- **AI-powered chat** in English, Hindi, and Kannada
+- **AI-powered chat** with expanded language support
 - **Consultation history** with generated reports
+- **Bilingual Prescription Display**: Toggle between languages
+- **Language Settings**: Update preferred language
+- **Consultation Controls**: Improved audio consultation UI
 
-### 🤖 AI Features
-- **Multilingual support**: English, Hindi (हिंदी), Kannada (ಕನ್ನಡ)
-- **Gemini AI integration** for medical assistance
-- **Automatic language detection** and response
-- **Consultation report generation** with structured medical summaries
+## 🛠️ Technical Implementation
 
-## Tech Stack
+### Backend Architecture
+```
+├── Flask Application (app.py)
+├── AI Engine (services/ai_engine.py)
+│   ├── Local Medical Database
+│   ├── Groq AI Integration (Primary)
+│   ├── Google Gemini Fallback
+│   └── Translation Services (deep-translator)
+├── Prescription Service (services/prescription_service.py)
+├── Authentication (services/auth_service.py)
+├── Consultation Service (services/consultation_service.py)
+├── Database Layer (database.py)
+└── Real-time Communication (SocketIO)
+```
 
-- **Backend**: Python Flask with REST APIs
-- **Database**: SQLite with SQLAlchemy ORM
-- **Real-time**: Flask-SocketIO for WebSocket notifications
-- **Frontend**: HTML, CSS, JavaScript (Vanilla)
-- **AI**: Google Gemini API
-- **Security**: bcrypt + JWT
+### External API Integrations
+- **Groq AI**: Primary AI service for medical queries (Mixtral model)
+- **Google Gemini**: Fallback AI service for comprehensive analysis
+- **Google Translate**: Translation services with medical terminology preservation
 
-## Setup & Installation
+### Database Schema
+- **Users**: Patient/Doctor authentication with language preferences
+- **Consultations**: Real-time consultation sessions
+- **Prescriptions**: Multi-language prescription storage
+- **Messages**: Chat messages with translation support
+- **Reports**: Medical report generation
+- **Notifications**: Real-time alerts
 
-1. **Clone/Download** the project files
+## 📋 Prerequisites
 
-2. **Install Python dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+- Python 3.8+
+- SQLite (built-in)
+- Web browser with WebRTC support
+- Microphone for voice consultations
+- API keys for full AI functionality (optional but recommended)
 
-3. **Set up environment variables**:
-   - Copy `.env.example` to `.env`
-   - Add your `GEMINI_API_KEY` (get from Google AI Studio)
-   - JWT secret is pre-configured for development
+## 🚀 Installation & Setup
 
-4. **Run the application**:
-   ```bash
-   # Windows
-   start.bat
+### 1. Clone and Setup Environment
+```bash
+git clone <repository-url>
+cd telemedicine-platform
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-   # Or manually:
-   cd backend
-   python app.py
-   ```
+### 2. Environment Configuration
+Create `.env` file with API keys:
+```env
+# Flask Configuration
+SECRET_KEY=your-secret-key-here
+JWT_SECRET=your-jwt-secret-here
+FLASK_DEBUG=true
 
-5. **Open browser** to `http://localhost:5000`
+# AI API Keys (optional but recommended)
+GROQ_API_KEY=your-groq-api-key
+GEMINI_API_KEY=your-gemini-api-key
+```
 
-## Usage
+### 3. Initialize Database
+```bash
+python -c "from database import init_db; init_db()"
+```
 
-### For Patients:
-1. **Sign up/Login** with email and password
-2. **Provide age and blood group** during signup
-3. **Browse available doctors** by specialization and experience
-4. **Start consultation** with preferred language
-5. **Chat with AI assistant** for symptom description
-6. **Generate consultation report** when done
+### 4. Start Server
+```bash
+python app.py
+```
 
-### For Doctors:
-1. **Sign up/Login** with professional details
-2. **Set availability** to accept/reject consultations
-3. **Receive real-time notifications** for new requests
-4. **View consultation history** with AI-generated reports
-5. **Manage profile** and NMC verification status
+Access the application at: http://localhost:5000
 
-## API Endpoints
+## 🔧 API Configuration
 
-### Authentication
-- `POST /api/auth/signup` - User registration
-- `POST /api/auth/login` - User login
+### Groq AI Setup
+1. Visit [Groq Console](https://console.groq.com/)
+2. Create API key
+3. Add to `.env`: `GROQ_API_KEY=your-key-here`
 
-### Doctor APIs
-- `GET /api/doctor/profile` - Get doctor profile
-- `PUT /api/doctor/availability` - Toggle availability
-- `GET /api/doctor/notifications` - Get notifications
-- `GET /api/doctor/consultations` - Get consultation history
+### Google Gemini Setup
+1. Visit [Google AI Studio](https://aistudio.google.com/)
+2. Create API key
+3. Add to `.env`: `GEMINI_API_KEY=your-key-here`
 
-### Patient APIs
-- `GET /api/patient/doctors` - List available doctors
-- `POST /api/patient/consult` - Request consultation
-- `POST /api/patient/consultations/{id}/chat` - Send chat message
-- `POST /api/patient/consultations/{id}/report` - Generate report
+## 🎯 Usage Guide
 
-## Security Features
+### For Patients
+1. **Registration**: Create account with preferred language
+2. **Doctor Selection**: Choose available specialist
+3. **Consultation**: Voice/video consultation with real-time translation
+4. **Prescription**: View bilingual prescriptions with language toggle
+5. **Language Settings**: Update language preferences anytime
 
-- **Password hashing** with bcrypt
-- **JWT authentication** with expiration
-- **Role-based access control**
-- **Input validation** and sanitization
-- **CORS protection**
-- **SQL injection prevention** via ORM
+### For Doctors
+1. **Dashboard**: Monitor patient queue and active consultations
+2. **AI Assistance**: Use AI for symptom analysis and prescription suggestions
+3. **Prescription**: Create and approve prescriptions with translation
+4. **Reports**: Generate comprehensive medical reports
+5. **Profile Management**: Update availability and professional details
 
-## Multilingual Support
+## 🔍 Key Features Implementation
 
-The platform supports three languages:
-- **English** (en)
-- **Hindi** (hi) - हिन्दी
-- **Kannada** (kn) - ಕನ್ನಡ
+### 1. Enhanced Medical Database
+```python
+# AI Engine integrates multiple sources
+def analyze_symptoms(transcript):
+    # Local pattern matching
+    local_result = analyze_local_database(transcript)
 
-AI responses are automatically provided in the user's language.
+    # Enhance with AI if confidence is low
+    if local_result['confidence'] < 0.6:
+        ai_enhancement = query_groq_medical_info(transcript)
+        local_result.update(ai_enhancement)
 
-## Database Schema
+    return local_result
+```
 
-- **Users**: Basic user info, role, credentials
-- **Doctors**: Professional details, NMC verification
-- **Consultations**: Chat sessions between patients and doctors
-- **Messages**: Individual chat messages (patient/AI)
-- **Notifications**: Real-time alerts for doctors
+### 2. Prescription Translation
+```python
+# Automatic translation on prescription creation
+def create_prescription(consultation_id, medicines, diet, exercise, notes):
+    patient_lang = get_patient_language(consultation_id)
 
-## Development Notes
+    # Translate all content
+    translated_medicines = translate_medicines(medicines, patient_lang)
+    translated_diet = translate_text(diet, 'en', patient_lang)
+    translated_exercise = translate_text(exercise, 'en', patient_lang)
 
-- Uses SQLite for simplicity (can be changed to PostgreSQL/MySQL)
-- WebSocket for real-time notifications
-- Responsive design with mobile support
-- Sample doctor data seeded on first run
+    # Store bilingual prescription
+    save_prescription_with_translations(...)
+```
 
-## Troubleshooting
+### 3. Dual-Language Display
+```javascript
+// Patient dashboard bilingual toggle
+function showPrescriptionLanguage(language) {
+    if (language === 'english') {
+        showEnglishVersion();
+    } else {
+        showTranslatedVersion();
+    }
+}
+```
 
-**Python 3.14 Compatibility Issue**:
-If you encounter SQLAlchemy import errors with Python 3.14, try:
-1. Use Python 3.12 or 3.11
-2. Or update SQLAlchemy to latest version
+### 4. Audio Consultation UI Fix
+```javascript
+// Panel toggle functionality
+function toggleConsultationPanel() {
+    const panel = document.querySelector('.consultation-panel');
+    panel.classList.toggle('hidden');
+}
+```
 
-**AI Features Not Working**:
-- Ensure `GEMINI_API_KEY` is set in `.env`
-- Check API quota and billing status
+## 🧪 Testing
 
-**Port Already in Use**:
-- Change port in `app.py` from 5000 to another port
+Run the comprehensive test suite:
+```bash
+python test_platform.py
+```
+
+Tests cover:
+- Import validation
+- AI engine functionality
+- API integrations
+- Database operations
+- Translation services
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure token-based authentication
+- **API Key Protection**: Environment variable storage
+- **Input Validation**: Comprehensive data validation
+- **SQL Injection Prevention**: Parameterized queries
+- **XSS Protection**: HTML escaping and sanitization
+- **Role-based Access Control**: Patient/Doctor permissions
+
+## 📱 Responsive Design
+
+- **Mobile-First**: Optimized for mobile devices
+- **Cross-Browser**: Compatible with modern browsers
+- **Accessibility**: WCAG compliant interface
+- **Progressive Enhancement**: Works without JavaScript
+
+## 🚨 Error Handling
+
+- **Graceful Degradation**: Functions without external APIs
+- **User Feedback**: Clear error messages and status indicators
+- **Fallback Systems**: Multiple AI services for redundancy
+- **Logging**: Comprehensive error logging for debugging
+
+## 🔄 Future Enhancements
+
+- **Video Calling**: WebRTC video consultation
+- **Medical Imaging**: AI-powered image analysis
+- **IoT Integration**: Wearable device data
+- **Blockchain**: Secure medical record storage
+- **Multi-tenant**: Healthcare organization support
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## 📞 Support
+
+For support and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the troubleshooting guide
 
 ---
 
-**MediConsult** — Bridging healthcare gaps with AI and technology.
+**MediConsult** — Bridging healthcare gaps with AI and technology for accessible healthcare worldwide.

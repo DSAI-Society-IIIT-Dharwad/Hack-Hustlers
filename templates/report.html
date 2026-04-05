@@ -309,52 +309,62 @@
                 }
 
                 // ── Report Sections ──
-                if (report && report.id) {
-                    document.getElementById('rpt-problem').textContent = report.problem || '—';
-                    document.getElementById('rpt-disease').textContent = report.disease || '—';
-                    document.getElementById('rpt-cause').textContent   = report.cause   || '—';
-                    document.getElementById('rpt-report-id').textContent     = `#${report.id}`;
-                    document.getElementById('rpt-generated-at').textContent  = formatDateTime(report.created_at);
+                if (report && typeof report === 'object' && report.id) {
+                    try {
+                        document.getElementById('rpt-problem').textContent = report.problem || '—';
+                        document.getElementById('rpt-disease').textContent = report.disease || '—';
+                        document.getElementById('rpt-cause').textContent   = report.cause   || '—';
+                        document.getElementById('rpt-report-id').textContent     = `#${report.id}`;
+                        document.getElementById('rpt-generated-at').textContent  = formatDateTime(report.created_at);
 
-                    // Symptoms as pills
-                    const chipsEl = document.getElementById('rpt-symptoms-chips');
-                    if (report.symptoms) {
-                        const symptoms = report.symptoms.split(',').map(s => s.trim()).filter(Boolean);
-                        chipsEl.innerHTML = symptoms.length > 0
-                            ? symptoms.map(s => `<span class="badge badge-info" style="font-size:0.72rem;">${escapeHtml(s)}</span>`).join('')
-                            : '<span class="text-muted text-sm">None identified</span>';
-                    }
+                        // Symptoms as pills
+                        const chipsEl = document.getElementById('rpt-symptoms-chips');
+                        if (report.symptoms) {
+                            const symptoms = report.symptoms.split(',').map(s => s.trim()).filter(Boolean);
+                            chipsEl.innerHTML = symptoms.length > 0
+                                ? symptoms.map(s => `<span class="badge badge-info" style="font-size:0.72rem;">${escapeHtml(s)}</span>`).join('')
+                                : '<span class="text-muted text-sm">None identified</span>';
+                        }
 
-                    // Precautions
-                    document.getElementById('rpt-precautions').innerHTML = renderBulletList(report.precautions);
+                        // Precautions
+                        document.getElementById('rpt-precautions').innerHTML = renderBulletList(report.precautions);
 
-                    // Diet & Exercise — prefer prescription values
-                    const dietText     = (prescription && prescription.diet)     ? prescription.diet     : report.diet_suggestions;
-                    const exerciseText = (prescription && prescription.exercise) ? prescription.exercise : report.exercise_suggestions;
-                    document.getElementById('rpt-diet').innerHTML     = renderBulletList(dietText);
-                    document.getElementById('rpt-exercise').innerHTML = renderBulletList(exerciseText);
+                        // Diet & Exercise — prefer prescription values
+                        const dietText     = (prescription && prescription.diet)     ? prescription.diet     : report.diet_suggestions;
+                        const exerciseText = (prescription && prescription.exercise) ? prescription.exercise : report.exercise_suggestions;
+                        document.getElementById('rpt-diet').innerHTML     = renderBulletList(dietText);
+                        document.getElementById('rpt-exercise').innerHTML = renderBulletList(exerciseText);
 
-                    // Doctor's Notes
-                    if (prescription && prescription.additional_notes) {
-                        document.getElementById('rpt-notes').innerHTML = escapeHtml(prescription.additional_notes).replace(/\n/g, '<br>');
-                    }
+                        // Doctor's Notes
+                        if (prescription && prescription.additional_notes) {
+                            document.getElementById('rpt-notes').innerHTML = escapeHtml(prescription.additional_notes).replace(/\n/g, '<br>');
+                        }
 
-                    // Confidence bar
-                    const confidence = Math.round((report.ai_confidence || 0) * 100);
-                    const barColor = confidence >= 70 ? 'var(--success)' : confidence >= 40 ? 'var(--warning)' : 'var(--danger)';
-                    document.getElementById('rpt-confidence-text').textContent = `${confidence}% confidence`;
-                    document.getElementById('rpt-confidence-text').style.color = barColor;
-                    const bar = document.getElementById('rpt-confidence-bar');
-                    bar.style.background = barColor;
-                    setTimeout(() => { bar.style.width = `${confidence}%`; }, 400);
+                        // Confidence bar
+                        const confidence = Math.round((report.ai_confidence || 0) * 100);
+                        const barColor = confidence >= 70 ? 'var(--success)' : confidence >= 40 ? 'var(--warning)' : 'var(--danger)';
+                        document.getElementById('rpt-confidence-text').textContent = `${confidence}% confidence`;
+                        document.getElementById('rpt-confidence-text').style.color = barColor;
+                        const bar = document.getElementById('rpt-confidence-bar');
+                        bar.style.background = barColor;
+                        setTimeout(() => { bar.style.width = `${confidence}%`; }, 400);
 
-                    // Disclaimer
-                    if (report.disclaimer) {
-                        document.getElementById('rpt-disclaimer').textContent = report.disclaimer;
-                        document.getElementById('rpt-disclaimer-box').style.display = 'block';
+                        // Disclaimer
+                        if (report.disclaimer) {
+                            document.getElementById('rpt-disclaimer').textContent = report.disclaimer;
+                            document.getElementById('rpt-disclaimer-box').style.display = 'block';
+                        }
+                    } catch (reportError) {
+                        console.error('Error processing report data:', reportError);
+                        showToast('Error displaying report data. Please refresh the page.', 'error');
                     }
                 } else {
-                    showToast('Report not yet generated. Ask your doctor to approve the prescription.', 'warning');
+                    console.warn('Report data:', report);
+                    if (report && report.error) {
+                        showToast('Report generation failed: ' + report.error, 'error');
+                    } else {
+                        showToast('Report not yet generated. Ask your doctor to approve the prescription.', 'warning');
+                    }
                 }
 
                 // ── Medicines Table ──

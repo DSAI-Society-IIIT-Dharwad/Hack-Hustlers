@@ -27,11 +27,27 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 
     try {
         const res = await fetch(`${API_BASE}${endpoint}`, options);
-        const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.error || `HTTP ${res.status}`);
+
+        // Check if response is JSON
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || `HTTP ${res.status}: ${data.message || 'Unknown error'}`);
+            }
+            return data;
+        } else {
+            // Handle non-JSON responses (like HTML error pages)
+            if (!res.ok) {
+                const text = await res.text();
+                if (text.includes('<!DOCTYPE html>') || text.includes('<html>')) {
+                    throw new Error(`Server error (HTTP ${res.status}). Please check if the server is running.`);
+                }
+                throw new Error(`Unexpected response format: ${text.substring(0, 100)}...`);
+            }
+            // If it's a successful non-JSON response, return it as text
+            return await res.text();
         }
-        return data;
     } catch (err) {
         if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
             USE_BACKEND = false;

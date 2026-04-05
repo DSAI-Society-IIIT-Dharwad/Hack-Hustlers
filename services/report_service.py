@@ -16,10 +16,13 @@ def generate_report(consultation_id):
             "SELECT * FROM consultations WHERE id = ?", (consultation_id,)
         ).fetchone()
         if not consultation:
-            return {'error': 'Consultation not found'}
+            return {'error': 'Consultation not found', 'success': False}
 
         consultation = dict_from_row(consultation)
         transcript = consultation.get('transcript', '')
+
+        if not transcript or transcript.strip() == '':
+            return {'error': 'No consultation transcript available for analysis', 'success': False}
 
         # AI analysis
         analysis = analyze_symptoms(transcript)
@@ -74,9 +77,20 @@ def generate_report(consultation_id):
             """, (consultation_id, *report_data.values()))
 
         db.commit()
+
+        # Get the report ID for the response
+        report_id = db.execute(
+            "SELECT id FROM reports WHERE consultation_id = ?", (consultation_id,)
+        ).fetchone()
+
         report_data['consultation_id'] = consultation_id
+        report_data['id'] = report_id['id'] if report_id else None
+
         return {'success': True, 'report': report_data}
 
+    except Exception as e:
+        print(f"Report generation error: {e}")
+        return {'error': f'Failed to generate report: {str(e)}', 'success': False}
     finally:
         db.close()
 

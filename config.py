@@ -10,3 +10,5 @@ class Config:
     DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'telemedicine.db')
     CORS_ORIGINS = ['*']
     DEBUG = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
+    GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
