@@ -17,7 +17,7 @@ env/
 instance/
 *.db
 *.sqlite
-*.sqlite3
+*.sqlite3 
 
 # Logs
 *.log

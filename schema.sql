@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS reports (
     exercise_suggestions TEXT DEFAULT '',
     disclaimer TEXT DEFAULT '',
     ai_confidence REAL DEFAULT 0.0,
+    native_report TEXT DEFAULT '',
+    native_language TEXT DEFAULT 'en',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (consultation_id) REFERENCES consultations(id)
 );

@@ -36,10 +36,14 @@ from services.prescription_service import (
     create_prescription, approve_prescription,
     get_prescription, get_prescription_by_id
 )
+<<<<<<< HEAD
+from services.report_service import generate_report, get_report, get_patient_reports, get_patient_doctor_history
+=======
 from services.report_service import (
     generate_report, get_report, get_patient_reports, 
     approve_report, get_patient_approved_reports
 )
+>>>>>>> c90c73693dc229b32b181e7b680b9500e0c4c1c7
 
 # ── App Setup ──────────────────────────────────────────────────
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -424,9 +428,21 @@ def api_get_prescription(consultation_id):
 def api_generate_report():
     data = request.get_json()
     consultation_id = data.get('consultation_id')
+    patient_language = data.get('patient_language', 'en')  # native lang for patient report
     if not consultation_id:
         return jsonify({'error': 'consultation_id required'}), 400
-    result = generate_report(consultation_id)
+    # If language not provided in payload, read original_language from the consultation
+    if not patient_language or patient_language == 'en':
+        from database import get_db, dict_from_row
+        db = get_db()
+        try:
+            row = db.execute('SELECT original_language FROM consultations WHERE id = ?',
+                             (consultation_id,)).fetchone()
+            if row and row['original_language']:
+                patient_language = row['original_language']
+        finally:
+            db.close()
+    result = generate_report(consultation_id, patient_language=patient_language)
     return jsonify(result)
 
 
@@ -437,6 +453,20 @@ def api_get_report(consultation_id):
     return jsonify(result or {})
 
 
+<<<<<<< HEAD
+@app.route('/report/native/<int:consultation_id>', methods=['GET'])
+@token_required
+def api_get_native_report(consultation_id):
+    """Return just the native-language report text for patient's dashboard."""
+    result = get_report(consultation_id)
+    if not result:
+        return jsonify({'error': 'Report not found'}), 404
+    return jsonify({
+        'native_report': result.get('native_report', ''),
+        'native_language': result.get('native_language', 'en'),
+        'consultation_id': consultation_id
+    })
+=======
 @app.route('/report/approve/<int:report_id>', methods=['POST'])
 @token_required
 def api_approve_report(report_id):
@@ -454,6 +484,7 @@ def api_get_approved_reports():
         return jsonify({'error': 'Patient not found'}), 404
     reports = get_patient_approved_reports(patient['id'])
     return jsonify({'approved_reports': reports or []})
+>>>>>>> c90c73693dc229b32b181e7b680b9500e0c4c1c7
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -476,6 +507,17 @@ def api_doctor_history():
         return jsonify({'error': 'Doctor not found'}), 404
     consultations = get_doctor_history(doctor['doctor_id'])
     return jsonify({'consultations': consultations})
+
+
+@app.route('/history/patient-doctor/<int:patient_id>/<int:doctor_id>', methods=['GET'])
+@token_required
+def api_patient_doctor_history(patient_id, doctor_id):
+    """
+    Returns all past completed consultations between a specific patient and doctor.
+    Used by the doctor dashboard to display returning-patient history.
+    """
+    history = get_patient_doctor_history(patient_id, doctor_id)
+    return jsonify({'history': history, 'is_returning': len(history) > 0, 'visit_count': len(history)})
 
 
 # ═══════════════════════════════════════════════════════════════

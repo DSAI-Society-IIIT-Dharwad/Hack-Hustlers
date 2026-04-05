@@ -1,10 +1,10 @@
 # MediConsult — AI-Powered Multilingual Telemedicine Platform
 
-A comprehensive telemedicine platform featuring AI-driven medical analysis, real-time multilingual consultations, automated prescription translation, and advanced healthcare management.
+A comprehensive telemedicine platform featuring AI-driven medical analysis, real-time multilingual consultations, automated prescription translation, and advanced healthcare management..
 
 ## 🚀 Features
 
-### 🤖 AI-Powered Medical Analysis
+### 🤖 AI-Powered Medical Analysis and that
 - **Symptom Analysis**: AI analyzes patient symptoms using local database + external APIs (Groq AI, Google Gemini)
 - **Urgency Detection**: Automatically detects medical emergencies and prioritizes consultations
 - **Medicine Verification**: Validates medicines with comprehensive database and AI assistance
