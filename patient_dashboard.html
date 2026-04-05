@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MedConnect AI — Patient Dashboard for telemedicine consultations">
+    <title>MedConnect AI — Patient Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Patient-specific enhancements */
+        .patient-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+        @media(max-width:768px){ .patient-stats{grid-template-columns:1fr;} }
+
+        .consult-banner {
+            background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(6,182,212,0.08));
+            border:1px solid rgba(59,130,246,0.25);
+            border-radius:var(--radius-lg);
+            padding:1.5rem; margin-bottom:1.5rem;
+            display:flex; align-items:center; justify-content:space-between; gap:1rem;
+            flex-wrap:wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="page-header">
+            <div class="brand">
+                <div class="brand-icon">🏥</div>
+                <span class="brand-text">MedConnect AI</span>
+            </div>
+            <div class="header-actions">
+                <span id="user-name" class="text-sm" style="color:var(--text-secondary);"></span>
+                <span class="badge badge-info"><i class="fas fa-user"></i> Patient</span>
+                <div class="language-selector" style="margin-right: 0.5rem;">
+                    <label class="text-xs text-muted font-bold" style="margin-right: 0.5rem;">Language:</label>
+                    <select id="header-language-select" onchange="updatePatientLanguage(this.value)" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--bg); color: var(--text);"></select>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="loadHistory()">
+                    <i class="fas fa-history"></i> History
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="handleLogout()" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ═══ VIEW: DOCTOR SELECTION ═══ -->
+            <div id="view-doctor-select">
+                <div class="flex items-center justify-between mb-lg">
+                    <div>
+                        <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="patient-welcome">Choose Your Doctor</h1>
+                        <p class="text-muted text-sm mt-sm">Select an available specialist to begin your consultation</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="loadDoctors()">
+                        <i class="fas fa-rotate-right"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Stats strip -->
+                <div class="patient-stats">
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(59,130,246,0.15);">👨‍⚕️</div>
+                        <div class="stat-value" id="stat-available">—</div>
+                        <div class="stat-label">Available Doctors</div>
+                    </div>
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.15);">📋</div>
+                        <div class="stat-value" id="stat-consultations">—</div>
+                        <div class="stat-label">My Consultations</div>
+                    </div>
+                    <div class="stat-card card-glass">
+                        <div class="stat-icon" style="background:rgba(139,92,246,0.15);">📄</div>
+                        <div class="stat-value" id="stat-reports">—</div>
+                        <div class="stat-label">Medical Reports</div>
+                    </div>
+                </div>
+
+                <div id="doctor-grid" class="doctor-grid">
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <span class="spinner"></span>
+                        <p class="text-sm mt-sm">Loading doctors...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ VIEW: CONSULTATION ═══ -->
+            <div id="view-consultation" class="hidden">
+                <div class="flex items-center justify-between mb-md">
+                    <div class="flex items-center gap-md">
+                        <button class="btn btn-ghost btn-sm" onclick="backToDoctorSelect()">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h2 style="font-size:1.2rem;font-weight:700;" id="consult-doctor-name">Consultation</h2>
+                            <p class="text-sm text-muted" id="consult-doctor-spec"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-sm">
+                        <span class="badge badge-success pulse" id="connection-status">
+                            <span class="badge-dot badge-dot-success"></span> Live
+                        </span>
+                        <button class="btn btn-ghost btn-sm" onclick="toggleConsultationPanel()" id="panel-toggle-btn" title="Toggle AI Panel">
+                            <i class="fas fa-chevron-right" id="panel-toggle-icon"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="endConsultation()" id="end-consult-btn">
+                            <i class="fas fa-phone-slash"></i> End
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Urgency Alert -->
+                <div id="urgency-alert" class="urgency-alert">
+                    <span class="urgency-icon" id="urgency-icon"></span>
+                    <span id="urgency-message"></span>
+                </div>
+
+                <div class="grid-main">
+                    <!-- Left: Chat -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-comments" style="color:var(--accent-primary);"></i> Conversation</h3>
+                                <div class="flex gap-sm">
+                                    <span class="badge badge-violet">AI Active</span>
+                                </div>
+                            </div>
+                            <div style="padding:0;">
+                                <div id="transcript-container" class="transcript-container">
+                                    <div class="empty-state" id="transcript-empty">
+                                        <div class="empty-state-icon">🎙️</div>
+                                        <p>Tap the microphone and start speaking.<br>Your words appear here in real-time.</p>
+                                    </div>
+                                </div>
+                                <!-- Typing indicator -->
+                                <div class="typing-indicator hidden" id="typing-indicator">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <span>Doctor is typing...</span>
+                                </div>
+                                <div class="subtitle-bar" id="subtitle-bar" style="margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;">
+                                    <span class="live-dot hidden" id="subtitle-dot"></span>
+                                    <span id="subtitle-text" style="flex:1;">Live subtitles will appear here...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Voice Controls -->
+                        <div class="card mt-md">
+                            <div class="card-body" style="padding:0;">
+                                <div class="voice-panel">
+                                    <button class="mic-button" id="mic-btn" onclick="toggleRecording()">
+                                        <i class="fas fa-microphone" id="mic-icon"></i>
+                                    </button>
+                                    <p class="mic-status" id="mic-status">Click microphone to start speaking</p>
+                                    <div class="waveform hidden" id="waveform">
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+                                        <div class="waveform-bar"></div>
+                                    </div>
+                                    <div class="language-selector">
+                                        <label class="text-xs text-muted font-bold">LANGUAGE:</label>
+                                        <select id="language-select" onchange="changeLanguage(this.value)"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Analysis + Prescription Panel -->
+                    <div>
+                        <!-- Prescription (shown after doctor approval) -->
+                        <div class="card card-glow-success" id="prescription-panel" style="display:none;margin-bottom:1rem;">
+                            <div class="card-header">
+                                <h3><i class="fas fa-prescription-bottle" style="color:var(--success);"></i> Your Prescription</h3>
+                                <span class="badge badge-success"><i class="fas fa-check"></i> Approved</span>
+                            </div>
+                            <div class="card-body" id="prescription-content"></div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary btn-sm btn-block" onclick="viewReport()">
+                                    <i class="fas fa-file-medical"></i> View Full Medical Report
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Live AI Analysis -->
+                        <div class="card" id="ai-analysis-panel">
+                            <div class="card-header">
+                                <h3><i class="fas fa-robot" style="color:#a78bfa;"></i> AI Analysis</h3>
+                                <span class="badge badge-violet">Live</span>
+                            </div>
+                            <div class="card-body" id="ai-analysis-content">
+                                <div class="empty-state" style="padding:2rem 1rem;">
+                                    <div class="empty-state-icon">🤖</div>
+                                    <p class="text-sm">Speak to your doctor — AI will analyze your symptoms in real-time and share insights.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ VIEW: HISTORY ═══ -->
+            <div id="view-history" class="hidden">
+                <div class="flex items-center justify-between mb-lg">
+                    <div>
+                        <h2 style="font-size:1.4rem;font-weight:800;">Medical History</h2>
+                        <p class="text-muted text-sm mt-sm">Your past consultations and medical reports</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="showDoctorSelect()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+                <div id="history-list">
+                    <div class="empty-state"><span class="spinner"></span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/voice.js"></script>
+    <script src="/static/js/patient.js"></script>
+</body>
+</html>

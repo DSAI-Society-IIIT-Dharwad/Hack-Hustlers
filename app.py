@@ -16,7 +16,7 @@ from config import Config
 from database import init_db
 
 # Services
-from services.auth_service import register_user, login_user, verify_token, get_user_profile, update_patient_language
+from services.auth_service import register_user, login_user, verify_token, get_user_profile, update_patient_language, get_patient_by_user_id
 from services.doctor_service import (
     list_doctors, get_doctor, get_doctor_by_user_id,
     set_availability, notify_doctor, get_pending_notifications, clear_notification
@@ -36,7 +36,10 @@ from services.prescription_service import (
     create_prescription, approve_prescription,
     get_prescription, get_prescription_by_id
 )
-from services.report_service import generate_report, get_report, get_patient_reports
+from services.report_service import (
+    generate_report, get_report, get_patient_reports, 
+    approve_report, get_patient_approved_reports
+)
 
 # ── App Setup ──────────────────────────────────────────────────
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -432,6 +435,25 @@ def api_generate_report():
 def api_get_report(consultation_id):
     result = get_report(consultation_id)
     return jsonify(result or {})
+
+
+@app.route('/report/approve/<int:report_id>', methods=['POST'])
+@token_required
+def api_approve_report(report_id):
+    result = approve_report(report_id)
+    return jsonify(result)
+
+
+@app.route('/patient/approved-reports', methods=['GET'])
+@token_required
+def api_get_approved_reports():
+    if request.user.get('role') != 'patient':
+        return jsonify({'error': 'Only patients can access this endpoint'}), 403
+    patient = get_patient_by_user_id(request.user['user_id'])
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+    reports = get_patient_approved_reports(patient['id'])
+    return jsonify({'approved_reports': reports or []})
 
 
 # ═══════════════════════════════════════════════════════════════
